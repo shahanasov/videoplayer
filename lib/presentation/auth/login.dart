@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:noviindusvideoapp/core/theme/colors.dart';
+import 'package:noviindusvideoapp/presentation/home/home.dart';
+import 'package:noviindusvideoapp/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController phoneController = TextEditingController();
@@ -8,6 +11,8 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -16,8 +21,6 @@ class LoginScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-
-              // Title
               const Text(
                 "Enter Your\nMobile Number",
                 style: TextStyle(
@@ -27,8 +30,6 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-
-              // Subtitle
               const Text(
                 "Create. Share. Inspire the world with your stories.",
                 style: TextStyle(
@@ -39,7 +40,7 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // Phone Number Input
+              // Phone Input
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.textSecondary),
@@ -47,7 +48,6 @@ class LoginScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    // Country code dropdown
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
@@ -55,26 +55,11 @@ class LoginScreen extends StatelessWidget {
                           right: BorderSide(color: AppColors.textSecondary),
                         ),
                       ),
-                      child: DropdownButton<String>(
-                        value: "+91",
-                        dropdownColor: Colors.black,
-                        underline: const SizedBox(),
-                        iconEnabledColor: Colors.white,
-                        items: const [
-                          DropdownMenuItem(
-                            value: "+91",
-                            child: Text("+91", style: TextStyle(color: Colors.white)),
-                          ),
-                          DropdownMenuItem(
-                            value: "+1",
-                            child: Text("+1", style: TextStyle(color: Colors.white)),
-                          ),
-                        ],
-                        onChanged: (value) {},
+                      child: const Text(
+                        "+91",
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-
-                    // TextField for phone number
                     Expanded(
                       child: TextField(
                         controller: phoneController,
@@ -98,12 +83,38 @@ class LoginScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate or validate
-                  },
+                  onPressed: authProvider.isLoading
+                      ? null
+                      : () async {
+                          await authProvider.verifyOtp(
+                            "+91",
+                            phoneController.text.trim(),
+                          );
+
+                          if (authProvider.token != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Login Successful")),
+                            );
+                            Future.delayed(
+                              const Duration(milliseconds: 500),
+                              () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const HomeScreen(),
+                                  ),
+                                );
+                              },
+                            );
+                          } else if (authProvider.error != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(authProvider.error!)),
+                            );
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
-                    side: BorderSide(color: AppColors.textSecondary),
+                    side: const BorderSide(color: AppColors.textSecondary),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -111,22 +122,32 @@ class LoginScreen extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        "Continue",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                      SizedBox(width: 10),
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundColor: Colors.red,
-                        child: Icon(Icons.arrow_forward, color: Colors.white, size: 18),
-                      ),
+                    children: [
+                      if (authProvider.isLoading)
+                        const CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        )
+                      else ...[
+                        const Text(
+                          "Continue",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                        const SizedBox(width: 10),
+                        const CircleAvatar(
+                          radius: 14,
+                          backgroundColor: Colors.red,
+                          child: Icon(
+                            Icons.arrow_forward,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
             ],
           ),
