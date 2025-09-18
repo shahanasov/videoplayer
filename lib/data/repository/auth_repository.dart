@@ -1,4 +1,4 @@
-// auth_repository.dart
+
 import 'package:noviindusvideoapp/data/services/auth_services.dart';
 import 'package:noviindusvideoapp/data/services/token_storage.dart';
 
@@ -28,13 +28,10 @@ class AuthRepository {
     }
   }
 
-  /// Optionally: read token from storage
+
   Future<String?> getSavedToken() async {
     return await tokenStorage.readToken();
   }
 
-  /// Optionally: clear token
-  Future<void> logout() async {
-    await tokenStorage.clearToken();
-  }
+
 }

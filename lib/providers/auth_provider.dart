@@ -33,11 +33,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> logout() async {
-    await authRepository.logout();
-    token = null;
-    notifyListeners();
-  }
+
 
   bool get isLoggedIn => token != null;
 }
