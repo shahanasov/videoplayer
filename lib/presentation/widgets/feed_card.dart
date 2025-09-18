@@ -59,14 +59,16 @@ class _FeedCardState extends State<FeedCard> {
 @override
 Widget build(BuildContext context) {
   return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    margin: const EdgeInsets.only(top: 5),
     decoration: BoxDecoration(
-      color: Colors.grey.shade900,
-      borderRadius: BorderRadius.circular(12),
+      color:AppColors.secondary,
+   
     ),
     child: Column(
+      spacing: 15,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 1,),
           // User + Time
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 5),
@@ -78,7 +80,7 @@ Widget build(BuildContext context) {
                     ? NetworkImage(widget.feed.userImage!)
                     : const AssetImage("assets/images/profile.jpg") as ImageProvider,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 20),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -102,23 +104,17 @@ Widget build(BuildContext context) {
         // Video / Thumbnail
         Stack(
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-              child: widget.isPlaying && _controller != null
-                  ? AspectRatio(
-                      aspectRatio: _controller!.value.aspectRatio,
-                      child: VideoPlayer(_controller!),
-                    )
-                  : Image.network(
-                      widget.feed.image,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: 280,
-                    ),
-            ),
+            widget.isPlaying && _controller != null
+                ? AspectRatio(
+                    aspectRatio: _controller!.value.aspectRatio,
+                    child: VideoPlayer(_controller!),
+                  )
+                : Image.network(
+                    widget.feed.image,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 280,
+                  ),
             // Play button
             if (!widget.isPlaying)
               Positioned.fill(

@@ -37,13 +37,11 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Categories
-            SizedBox(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Categories
+              SizedBox(
               height: 45,
               child: Consumer<HomeProvider>(
                 builder: (context, provider, _) {
@@ -98,39 +96,37 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-
-            // Feeds
-            Expanded(
-              child: Consumer<HomeProvider>(
-                builder: (context, provider, _) {
-                  if (provider.isLoadingFeeds) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (provider.feeds.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "No feeds available",
-                        style: TextStyle(color: AppColors.white),
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    itemCount: provider.feeds.length,
-                    itemBuilder: (context, index) {
-                      final feed = provider.feeds[index];
-
-                      return FeedCard(
-                        feed: feed,
-                        isPlaying: provider.playingVideoIndex == index,
-                        onPlay: () => provider.setPlayingVideo(index),
-                      );
-                    },
+          // Feeds
+          Expanded(
+            child: Consumer<HomeProvider>(
+              builder: (context, provider, _) {
+                if (provider.isLoadingFeeds) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (provider.feeds.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No feeds available",
+                      style: TextStyle(color: AppColors.white),
+                    ),
                   );
-                },
-              ),
+                }
+      
+                return ListView.builder(
+                  itemCount: provider.feeds.length,
+                  itemBuilder: (context, index) {
+                    final feed = provider.feeds[index];
+      
+                    return FeedCard(
+                      feed: feed,
+                      isPlaying: provider.playingVideoIndex == index,
+                      onPlay: () => provider.setPlayingVideo(index),
+                    );
+                  },
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: SizedBox(
         width: 60,

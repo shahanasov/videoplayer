@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:noviindusvideoapp/data/models/category_model.dart';
 import 'package:noviindusvideoapp/data/models/feed_model.dart';
 import 'package:noviindusvideoapp/data/repository/home_repository.dart';
+import 'package:noviindusvideoapp/providers/add_feed_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeProvider extends ChangeNotifier {
   final HomeRepository repository;
@@ -11,16 +13,33 @@ class HomeProvider extends ChangeNotifier {
     fetchFeeds();
   }
 
- 
-  List<Category> categories = [];
+  List<Category> categories = []; // List<Category>
+  List<Category> selectedCategories = [];
+  bool isLoadingCategories = false;
+
+  void setCategories(List<Category> newCategories) {
+    categories = newCategories;
+    notifyListeners();
+  }
+
+  void toggleCategorySelection(Category category, BuildContext context) {
+    if (selectedCategories.contains(category)) {
+      selectedCategories.remove(category);
+    } else {
+      selectedCategories.add(category);
+    }
+
+    // Update FeedProvider as well
+    final feedProvider = Provider.of<AddFeedProvider>(context, listen: false);
+    feedProvider.setCategories(selectedCategories.map((c) => c.id).toList());
+
+    notifyListeners();
+  }
   List<Feed> feeds = [];
   int selectedCategoryIndex = 0;
   int playingVideoIndex = -1;
 
-  bool isLoadingCategories = true;
   bool isLoadingFeeds = true;
-
-
 
   void selectCategory(int index) {
     selectedCategoryIndex = index;
@@ -31,9 +50,6 @@ class HomeProvider extends ChangeNotifier {
     playingVideoIndex = index;
     notifyListeners();
   }
-
-
-  
 
   // Fetch categories
   Future<void> fetchCategories() async {
